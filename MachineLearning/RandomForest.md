@@ -1,4 +1,4 @@
-# Randonm Forest
+# Random Forest
 
 
 ### Overview
