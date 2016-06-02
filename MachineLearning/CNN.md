@@ -77,6 +77,10 @@ The Rectified Linear Unit has become very popular in the last few years. It comp
 - (+) Compared to tanh/sigmoid neurons that involve expensive operations (exponentials, etc.), the ReLU can be implemented by simply thresholding a matrix of activations at zero.
 - (-) Unfortunately, ReLU units can be fragile during training and can “die”. For example, a large gradient flowing through a ReLU neuron could cause the weights to update in such a way that the neuron will never activate on any datapoint again. If this happens, then the gradient flowing through the unit will forever be zero from that point on. That is, the ReLU units can irreversibly die during training since they can get knocked off the data manifold. For example, you may find that as much as 40% of your network can be “dead” (i.e. neurons that never activate across the entire training dataset) if the learning rate is set too high. With a proper setting of the learning rate this is less frequently an issue.
 
+**Leaky ReLU**
+
+Leaky ReLUs are one attempt to fix the “dying ReLU” problem. Instead of the function being zero when x < 0, a leaky ReLU will instead have a small negative slope (of 0.01, or so). That is, the function computes f(x)=(x<0)(αx)+(x>=0)(x) where α is a small constant.
+
 ### 2.3 池化层（Pooling layer）
 
 池化（pool）即下采样（downsamples），目的是为了减少特征图。池化操作对每个深度切片独立，规模一般为 2*2，相对于卷积层进行卷积运算，池化层进行的运算一般有以下几种：
@@ -134,3 +138,5 @@ References:
 5.[http://ufldl.stanford.edu/wiki/index.php/Softmax%E5%9B%9E%E5%BD%92](http://ufldl.stanford.edu/wiki/index.php/Softmax%E5%9B%9E%E5%BD%92)
 
 6.[http://deeplearning.net/tutorial/lenet.html](http://deeplearning.net/tutorial/lenet.html)
+
+7.[http://cs231n.github.io/neural-networks-1/](http://cs231n.github.io/neural-networks-1/)
