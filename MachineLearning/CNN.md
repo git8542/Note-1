@@ -70,6 +70,13 @@ ReLU is the abbreviation of Rectified Linear Units. This is a layer of neurons t
 
 Other functions are also used to increase nonlinearity, for example the saturating hyperbolic **tangent** and the **sigmoid** function. Compared to other functions the usage of ReLU is preferable, because it results in the neural network training several times faster, without making a significant difference to generalisation accuracy.
 
+**Adds**:
+
+The Rectified Linear Unit has become very popular in the last few years. It computes the function f(x)=max(0,x). In other words, the activation is simply thresholded at zero . There are several pros and cons to using the ReLUs:
+- (+) It was found to greatly accelerate the convergence of stochastic gradient descent compared to the sigmoid/tanh functions. It is argued that this is due to its linear, non-saturating form.
+- (+) Compared to tanh/sigmoid neurons that involve expensive operations (exponentials, etc.), the ReLU can be implemented by simply thresholding a matrix of activations at zero.
+- (-) Unfortunately, ReLU units can be fragile during training and can “die”. For example, a large gradient flowing through a ReLU neuron could cause the weights to update in such a way that the neuron will never activate on any datapoint again. If this happens, then the gradient flowing through the unit will forever be zero from that point on. That is, the ReLU units can irreversibly die during training since they can get knocked off the data manifold. For example, you may find that as much as 40% of your network can be “dead” (i.e. neurons that never activate across the entire training dataset) if the learning rate is set too high. With a proper setting of the learning rate this is less frequently an issue.
+
 ### 2.3 池化层（Pooling layer）
 
 池化（pool）即下采样（downsamples），目的是为了减少特征图。池化操作对每个深度切片独立，规模一般为 2*2，相对于卷积层进行卷积运算，池化层进行的运算一般有以下几种：
