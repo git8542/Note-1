@@ -3,6 +3,11 @@
 ## Overview
 Convolutional networks were inspired by biological processes and are variations of **multilayer perceptrons** designed to use **minimal amounts of preprocessing**. They have wide applications in image and video recognition, recommender systems and natural language processing.
 
+MLP存在以下两个问题：
+
+1. 参数过多（如上所述）
+2. 层数较多时，BP训练梯度容易消失。
+
 ## 1. Features
 While traditional multilayer perceptron (MLP) models were successfully used for image recognition, due to the full connectivity between nodes they suffer from the curse of dimensionality and thus do not scale well to higher resolution images.
 
@@ -76,6 +81,8 @@ The Rectified Linear Unit has become very popular in the last few years. It comp
 - (+) It was found to greatly accelerate the convergence of stochastic gradient descent compared to the sigmoid/tanh functions. It is argued that this is due to its linear, non-saturating form.
 - (+) Compared to tanh/sigmoid neurons that involve expensive operations (exponentials, etc.), the ReLU can be implemented by simply thresholding a matrix of activations at zero.
 - (-) Unfortunately, ReLU units can be fragile during training and can “die”. For example, a large gradient flowing through a ReLU neuron could cause the weights to update in such a way that the neuron will never activate on any datapoint again. If this happens, then the gradient flowing through the unit will forever be zero from that point on. That is, the ReLU units can irreversibly die during training since they can get knocked off the data manifold. For example, you may find that as much as 40% of your network can be “dead” (i.e. neurons that never activate across the entire training dataset) if the learning rate is set too high. With a proper setting of the learning rate this is less frequently an issue.
+
+（sigmoid函数比ReLU更容易出现梯度消失）
 
 **Leaky ReLU**
 
