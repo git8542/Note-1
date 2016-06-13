@@ -2,7 +2,7 @@
 
 1.**关于MLP和CNN的线性问题**
 
-MLP的非线性主要体现在activation function上，CNN的非线性主要体现在卷积，采样操作上，而它的activation function ReLU却是线性的。
+MLP的非线性主要体现在activation function上，CNN的非线性主要体现在卷积和feature maps的堆积上，采样操作上，而它的activation function ReLU却是线性的。
 
 2.**关于归一化问题**
 
