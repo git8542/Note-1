@@ -85,9 +85,9 @@
 	wordlists = PlaintextCorpusReader(corpus_root, '.*')
 	print wordlists.fileids()
 
-# 3.
+# 3.条件频率分布
 
-(1) 条件频率分布
+(1) **条件频率分布**
 
 这里的条件指的是文本的类别。当文本被分为几类，我们可以计算出每个类别独立的频率分布。我们不仅仅只是想知道整个语料库中词的频率分布，我们还可能想知道语料库中言情小说中（假设我们的语料库包含言情小说、玄幻小说等题材分类）词的频率分布。
 
@@ -121,7 +121,7 @@ ConditionalFreqDist接收一个以（condition_word,word）为元素的list。
 	In[11]: cfd[u'news']
 	Out[11]: FreqDist({u'the': 5580, u',': 5188, u'.': 4030, u'of': 2849, u'and': 2146, u'to': 2116, u'a': 1993, u'in': 1893, u'for': 943, u'The': 806, ...})
 
-（2）绘制分布图和分布表
+（2）**绘制分布图和分布表**
 
 ConditionalFreqDist为绘图和制表提供了一些方法，常用的有plot(),tabulate().
 
@@ -133,4 +133,46 @@ ConditionalFreqDist为绘图和制表提供了一些方法，常用的有plot(),
            I love  you 
 	fiction  511   16  236 
 	In[17]: cfd.plot(conditions=['fiction'], samples=['I', 'love', 'you'])
-	![](http://i.imgur.com/zNIF3s0.png)
+
+![](http://i.imgur.com/zNIF3s0.png)
+
+（3）**条件频率分布常见函数**
+<table>
+<tr>
+<td>cfdist=ConditionalFreqDist(pairs)</td>
+<td>从配对链表中创建条件概率分布</td>
+</tr>
+
+<tr>
+<td>cfdist.conditions()</td>
+<td>将条件按字母排序</td>
+</tr>
+
+<tr>
+<td>cfdist[condition]</td>
+<td>此条件下的频率分布</td>
+</tr>
+
+<tr>
+<td>cfdist[condition][sample]</td>
+<td>此条件下给定样本的频率</td>
+</tr>
+
+<tr>
+<td>cfdist.tabulate(samples, conditions)</td>
+<td>指定样本和条件下的制表</td>
+</tr>
+
+<tr>
+<td>cfdist.plot(samples, conditions)</td>
+<td>指定样本和条件下的绘图</td>
+</tr>
+
+<tr>
+<td>cfdist1 < cfdist2</td>
+<td>测试样本在cfdist1中出现的频率是否小于在cfdist2中出现的次数</td>
+</tr>
+</table>
+
+# 4.WordNet
+[https://zh.wikipedia.org/wiki/WordNet](https://zh.wikipedia.org/wiki/WordNet)
