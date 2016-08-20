@@ -31,7 +31,7 @@ classifier = nltk.NaiveBayesClassifier.train(train_set)
 print classifier.classify(gender_features(u'Neo'))
 # 分类器评估
 print nltk.classify.accuracy(classifier, test_set)
-# 查看last_letter这个特征的哪些值是最有效的
+# 查看哪些特征是有效的
 classifier.show_most_informative_features(5)
 
 ```
@@ -44,9 +44,9 @@ classifier.show_most_informative_features(5)
 > Most Informative Features
 > 
 last_letter = u'd'      |       male : female =     28.6 : 1.0
----------------------------------------------------------------
-last_letter = u'a'           female : male   =     20.6 : 1.0
-last_letter = u's'             male : female =      8.1 : 1.0
-last_letter = u'r'             male : female =      4.1 : 1.0
-last_letter = u'p'             male : female =      4.1 : 1.0
+------------------------|--------------------------------------
+last_letter = u'a'      |     female : male   =     20.6 : 1.0
+last_letter = u's'      |       male : female =      8.1 : 1.0
+last_letter = u'r'      |       male : female =      4.1 : 1.0
+last_letter = u'p'      |       male : female =      4.1 : 1.0
 
