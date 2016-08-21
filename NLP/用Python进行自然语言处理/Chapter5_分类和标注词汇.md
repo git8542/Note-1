@@ -90,7 +90,10 @@ regexp_tagger = nltk.RegexpTagger(pattern)
 print regexp_tagger.tag(tokens)
 
 ```
+**改进**：
 
+这里的后缀我们完全是人工规定出来的，其实我们可以统计出频率较高的后缀。
+甚至我们可以用这些频率高的后缀作为特征训练出一个词性分类器来。
 ## （3）查询标注器
 找出前n个最频繁的词，存储他们的标记，然后使用此信息作为查询标注器的模型。
 ```python
