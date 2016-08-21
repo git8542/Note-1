@@ -1,6 +1,15 @@
 ### 目录
 
 - 1.信息提取
+    - 信息提取定义
+    - 信息提取流程
+- 2.分块（chunking）
+    - 动名词分块（牛刀小试）
+    - 用正则表达式chunk
+    - chink（加缝隙）
+    - chunk的表示：tag表示和tree表示
+- 3.开发和评估分块器
+
 
 
 # 1.信息提取
@@ -42,18 +51,14 @@ grammar = 'NP: {<DT>?<JJ>*<NN>}'  # 标记模式，类似于正则但不是正�
 cp = nltk.RegexpParser(grammar)
 result = cp.parse(sentence)
 print result
-
 ```
 *output*
-> (S
->
->  (NP the/DT little/JJ yellow/JJ dog/NN)
->
->  barked/VBD
->
->  at/IN
->
->  (NP the/DT cat/NN))
+
+    (S
+        (NP the/DT little/JJ yellow/JJ dog/NN)
+        barked/VBD
+        at/IN
+        (NP the/DT cat/NN))
 
 ## （2）用正则表达式chunk
 
@@ -72,19 +77,14 @@ cp = nltk.RegexpParser(grammar)
 sentence = [("Rapunzel", "NNP"), ("let", "VBD"), ("down", "RP"), ("her", "PP$"), ("long", "JJ"), ("golden", "JJ"),
             ("hair", "NN")]
 print cp.parse(sentence)  # 结果为树状结果，你可以掉用draw()方法plot出来；还可以迭代它
-
-
 ```
 *output*
-> (S
->
->  (NP Rapunzel/NNP)
->
->  let/VBD
->
->  down/RP
->
->  (NP her/PP$ long/JJ golden/JJ hair/NN))
+
+    (S
+        (NP Rapunzel/NNP)
+        let/VBD
+        down/RP
+        (NP her/PP$ long/JJ golden/JJ hair/NN))
 
 当出现标记模式匹配位置重叠，最左边的匹配优先。比如：`金融` `市场` `投资`，一种模式既可以识别
 `金融市场`，也可以识别`市场投资`,则优先匹配`金融市场`。
@@ -131,3 +131,121 @@ chunk类型后缀，比如NP）
 ![](http://i.imgur.com/dMmYyud.png)
 
 树作为nltk中chunk的内部表示。
+
+# 3.开发和评估分块器
+
+## （1）读取IOB格式
+一般来说，chunk类型包括NP，VP，PP。我们使用chunk.conllstr2tree()方法将IOB格式的
+字符串/文件转换为树状结构。
+
+*code*
+```python
+# -*-coding: utf-8 -*-
+import nltk
+
+text = '''
+he PRP B-NP
+accepted VBD B-VP
+the DT B-NP
+position NN I-NP
+of IN B-PP
+vice NN B-NP
+chairman NN I-NP
+of IN B-PP
+Carlyle NNP B-NP
+Group NNP I-NP
+a DT B-NP
+merchant NN I-NP
+banking NN I-NP
+concern NN I-NP
+'''
+tree = nltk.chunk.conllstr2tree(text, chunk_types=('NP',))
+```
+
+## （2）分块语料库
+nltk提供了分块语料库，你可以使用`nltk.corpus.conll2000`访问
+
+*code example*
+```python
+# -*-coding: utf-8 -*-
+import nltk
+from nltk.corpus import conll2000
+
+print conll2000.chunked_sents('train.txt', chunk_types=['NP'])[0]
+```
+
+## （3）简单评估分块器
+我们使用正则表达式分块器。
+
+*我们的分块器不起作用时*
+```python
+# -*-coding: utf-8 -*-
+import nltk
+from nltk.corpus import conll2000
+cp = nltk.RegexpParser('')  # 这个正则不产生任何chunk效果
+test_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+print cp.evaluate(test_sents)
+```
+*output*
+
+    ChunkParse score:
+        IOB Accuracy:  44.1%
+        Precision:      0.0%
+        Recall:         0.0%
+        F-Measure:      0.0%
+
+IOB标记准确率超过四成表明那么多的词被标注为O，即在NP块之外。
+
+*很简单的正则分块器*
+```python
+# -*-coding: utf-8 -*-
+import nltk
+from nltk.corpus import conll2000
+grammar = r'NP: {<[CDJNP].*>+}'  # 以名词短语的特征字母（如CD，DT，JJ）开头的标记（？？？）
+cp = nltk.RegexpParser(grammar)
+test_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+print cp.evaluate(test_sents)
+```
+*output*
+
+    ChunkParse score:
+        IOB Accuracy:  87.4%
+        Precision:     69.7%
+        Recall:        67.5%
+        F-Measure:     68.6%
+
+## （4）使用unigram标注器建立分块器
+使用unigram标注器可以标注词性，同样的道理，我们可以设想是否可以用unigram标注器
+建立分块器。（注意：unigram只是从训练集记住那些已经有tag的词，它不具备泛化能力）
+```python
+# -*-coding: utf-8 -*-
+import nltk
+from nltk.corpus import conll2000
+
+# 建立unigram分块器
+class UnigramChunker(nltk.ChunkParserI):
+    def __init__(self, train_sents):
+        train_data = [
+            [(tag, chunk_tag) for word, tag, chunk_tag in nltk.chunk.tree2conlltags(sent)] for sent in train_sents
+        ]
+        self.tagger = nltk.UnigramTagger(train_data)
+
+    def parse(self, sentence):
+        pos_tags = [pos for (word, pos) in sentence]  # 词性tag
+        tagged_pos_tags = self.tagger.tag(pos_tags)
+        chunktags = [chunktag for (pos, chunktag) in tagged_pos_tags]
+        conlltags = [(word, pos, chunktag) for ((word, pos), chunktag) in zip(sentence, chunktags)]
+        return nltk.chunk.conlltags2tree(conlltags)
+# 测试
+test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
+train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+unigram_chunker = UnigramChunker(train_sents)
+print unigram_chunker.evaluate(test_sents)
+```
+*output*
+
+    ChunkParse score:
+        IOB Accuracy:  92.9%
+        Precision:     79.9%
+        Recall:        86.8%
+        F-Measure:     83.2%
