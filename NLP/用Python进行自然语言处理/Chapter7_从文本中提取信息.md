@@ -14,6 +14,11 @@
     - 简单评估分块器
     - 使用unigram标注器建立分块器
     - 训练基于分类器的分块器
+- 4.命名实体识别（NER）
+    - 子任务
+    - 难点
+    - 识别
+- 5.关系抽取
 
 # 1.信息提取
 
@@ -328,3 +333,156 @@ print chunker.evaluate(test_sents)
         F-Measure:     84.2%
 
 接下来，如果想提高分类器的能力，那就试着选取好一点的特征。
+
+# 4.命名实体识别（NER）
+NER有两个**子任务**：确定NE的边界及其类型。它是信息提取中关系识别的前提。
+
+NER识别的**难点**在于：
+
+（1）使用名称词典查找来识别命名实体是不可能的，因为数据量实在太大，而且更新太快
+
+（2）许多NE措辞都有歧义
+
+（3）会有多词NE和包含其它NE的NE
+
+NER非常适合用分类来处理，我们可以自己训练一个分类器来做，NLTK也已经训练好了一个
+。下面介绍NLTK中NER的实现。
+
+*文件中数据是这么存储*
+
+    Eddy N B-PER
+    Bonte N I-PER
+    is V O
+    woordvoerder N O
+    van Prep O
+    diezelfde Pron O
+    Hogeschool N B-ORG
+    . Punc O
+
+我们可以用`nltk.chunk.conlltags2tree()`函数将标记序列转化为一个chunk tree。
+我们可以通过`nltk.ne_chunk()`使用训练好的NER器.如果参数`binary`设置为`True`,
+命名实体只被标注为`NE`,否则分类器会添加类型标签，如`PERSON`，`ORGANIZATION`，`GPE`
+
+*code examples*
+```python
+# -*-coding: utf-8 -*-
+import nltk
+
+sent = nltk.corpus.treebank.tagged_sents()[22]
+print nltk.ne_chunk(sent, binary=True)
+print u'---------------------------------------------------------------------------'
+print nltk.ne_chunk(sent)
+
+```
+*output*
+
+    (S
+     The/DT
+     (NE U.S./NNP)
+     is/VBZ
+     one/CD
+     of/IN
+     the/DT
+     few/JJ
+     industrialized/VBN
+     nations/NNS
+     that/WDT
+     *T*-7/-NONE-
+     does/VBZ
+     n't/RB
+     have/VB
+     a/DT
+     higher/JJR
+     standard/NN
+     of/IN
+     regulation/NN
+     for/IN
+     the/DT
+     smooth/JJ
+     ,/,
+     needle-like/JJ
+     fibers/NNS
+     such/JJ
+     as/IN
+     crocidolite/NN
+     that/WDT
+     *T*-1/-NONE-
+     are/VBP
+     classified/VBN
+     *-5/-NONE-
+     as/IN
+     amphobiles/NNS
+     ,/,
+     according/VBG
+     to/TO
+     (NE Brooke/NNP)
+     T./NNP
+     Mossman/NNP
+     ,/,
+     a/DT
+     professor/NN
+     of/IN
+     pathlogy/NN
+     at/IN
+     the/DT
+     (NE University/NNP)
+     of/IN
+     (NE Vermont/NNP College/NNP)
+     of/IN
+     (NE Medicine/NNP)
+     ./.)
+    ---------------------------------------------------------------------------
+    (S
+     The/DT
+     (GPE U.S./NNP)
+     is/VBZ
+     one/CD
+     of/IN
+     the/DT
+     few/JJ
+     industrialized/VBN
+     nations/NNS
+     that/WDT
+     *T*-7/-NONE-
+     does/VBZ
+     n't/RB
+     have/VB
+     a/DT
+     higher/JJR
+     standard/NN
+     of/IN
+     regulation/NN
+     for/IN
+     the/DT
+     smooth/JJ
+     ,/,
+     needle-like/JJ
+     fibers/NNS
+     such/JJ
+     as/IN
+     crocidolite/NN
+     that/WDT
+     *T*-1/-NONE-
+     are/VBP
+     classified/VBN
+     *-5/-NONE-
+     as/IN
+     amphobiles/NNS
+     ,/,
+     according/VBG
+     to/TO
+     (PERSON Brooke/NNP T./NNP Mossman/NNP)
+     ,/,
+     a/DT
+     professor/NN
+     of/IN
+     pathlogy/NN
+     at/IN
+     the/DT
+     (ORGANIZATION University/NNP)
+     of/IN
+     (PERSON Vermont/NNP College/NNP)
+     of/IN
+     (GPE Medicine/NNP)
+     ./.)
+
