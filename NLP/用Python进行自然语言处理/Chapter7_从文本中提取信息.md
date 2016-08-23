@@ -335,7 +335,8 @@ print chunker.evaluate(test_sents)
 接下来，如果想提高分类器的能力，那就试着选取好一点的特征。
 
 # 4.命名实体识别（NER）
-NER有两个**子任务**：确定NE的边界及其类型。它是信息提取中关系识别的前提。
+NER有两个**子任务**：确定NE的边界及其类型。它是信息提取中关系识别的前提。实体类型
+一般包括：组织、人员、地点、日期、时间、货币、GPE。
 
 NER识别的**难点**在于：
 
@@ -485,4 +486,39 @@ print nltk.ne_chunk(sent)
      of/IN
      (GPE Medicine/NNP)
      ./.)
+
+# 5.关系抽取
+
+一旦文本中的命名实体被识别，我们就可以提取它们之间存在的关系。我们通常会找
+指定类型的命名实体之间的关系。其中一种常用的方法是首先寻找所有的`（X， a，Y）`
+形式的三元组，其中`X`和`Y`是指定类型的命名实体,`a`表示`X`和`Y`之间关系的字符串.
+然后我们可以使用正则表达式从`a`的中抽出我们正在查找的关系。
+
+*code example*
+
+```pyhton
+# -*-coding: utf-8 -*-
+import nltk
+import re
+
+IN = re.compile(r'.*\bin\b(?!\b.+ing)')  # 抽取包含in的关系
+for doc in nltk.corpus.ieer.parsed_docs('NYT_19980315'):
+    for rel in nltk.sem.extract_rels('ORG', 'LOC', doc, corpus='ieer', pattern=IN):
+        print nltk.sem.rtuple(rel)
+```
+*output*
+
+    [ORG: u'WHYY'] u'in' [LOC: u'Philadelphia']
+    [ORG: u'McGlashan &AMP; Sarrail'] u'firm in' [LOC: u'San Mateo']
+    [ORG: u'Freedom Forum'] u'in' [LOC: u'Arlington']
+    [ORG: u'Brookings Institution'] u', the research group in' [LOC: u'Washington']
+    [ORG: u'Idealab'] u', a self-described business incubator based in' [LOC: u'Los Angeles']
+    [ORG: u'Open Text'] u', based in' [LOC: u'Waterloo']
+    [ORG: u'WGBH'] u'in' [LOC: u'Boston']
+    [ORG: u'Bastille Opera'] u'in' [LOC: u'Paris']
+    [ORG: u'Omnicom'] u'in' [LOC: u'New York']
+    [ORG: u'DDB Needham'] u'in' [LOC: u'New York']
+    [ORG: u'Kaplan Thaler Group'] u'in' [LOC: u'New York']
+    [ORG: u'BBDO South'] u'in' [LOC: u'Atlanta']
+    [ORG: u'Georgia-Pacific'] u'in' [LOC: u'Atlanta']
 
