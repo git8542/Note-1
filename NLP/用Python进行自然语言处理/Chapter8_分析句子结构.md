@@ -11,8 +11,8 @@
     - 递归下降分析（RDP）
     - 移进归约分析（SRP）
     - 左角落分析（LCP）
-    - 符合语句规则的字串表
-
+    - 符合语句规则的子串表
+- 5.依存文法
 
 ### Overview
 前面我们一直关注词，现在我们来看看句子。`语言`被认为是所有合乎文法的句子的巨大集合
@@ -174,7 +174,7 @@ for tree in sr_parse.parse(sent):
 
 **评价**
 
-分析器经常会面临两个选择：（a）有多种归约时，应该选择那种归约（b）当移进和归约
+分析器经常会面临两个选择：（a）有多种归约时，应该选择哪种归约（b）当移进和归约
 都可以时选择哪个
 
 *缺点*：可能会到达一个死胡同，而不能找到任何解析，尽管输入的句子是合法的。当这种
@@ -203,7 +203,7 @@ lr_parse = nltk.LeftCornerChartParser(grammar)
 for tree in lr_parse.parse(sent):
     print tree
 ```
-## （4）符合语法规则的字串表
+## （4）符合语法规则的子串表
 这种方法利用动态规划存储中间结果，在适当的时候重用它们，能显著提高效率。动态规划
 使我们只用一次建立`PP in my pajamas`之后，将其存入一个表格，然后在我们需要作为
 对象`NP`或者更高的`VP`的组成成分用到它时，我们就查找表格。这个表格被称为*符合语法规则的子串表*
@@ -239,3 +239,39 @@ for tree in c_parse.parse(sent):
     （3）作为一个自下而上的方法，它潜在的存在浪费，会在不符合文法的地方提出成分。（也没明白）
     （4）它不能表示句子中的结构歧义。（？？）
 
+# 5.依存文法
+
+## （1）依存文法与依存关系
+我们前面所讲的文法皆属于*短语结构文法*，它关注词和词序列如何结合起来形成句子成分。另一个独特的和互补的方式**依存文法**，集中
+关注词和其它词之间的关系。**依存关系**是一个*中心词*和它的*依赖*之间的二元对称关系。中心词通常是动词，所有其它词要么依赖于
+中心词，要么依赖路径与它联通。
+
+依存关系可以用一个加标签的有向图表示，其中节点是词汇项，加标签的弧表示
+依赖关系，方向从中心到依赖。
+
+*NLTK表示*
+
+NLTK为依存文法编码了一种方式，但是请注意——它只能捕捉依存关系，不能指定依存关系
+类型。
+```python
+# -*- coding: utf-8 -*-
+from nltk.grammar import DependencyGrammar
+__author__ = 'BrownWong'
+dep_grammar = DependencyGrammar.fromstring("""
+    'shot' -> 'I' | 'elephant' | 'in'
+    'elephant' -> 'an' | 'in'
+    'in' -> 'pajamas'
+    'pajamas' -> 'my'
+    """)
+print dep_grammar
+```
+*output*
+
+    Dependency grammar with 7 productions
+    'shot' -> 'I'
+    'shot' -> 'elephant'
+    'shot' -> 'in'
+    'elephant' -> 'an'
+    'elephant' -> 'in'
+    'in' -> 'pajamas'
+    'pajamas' -> 'my'
