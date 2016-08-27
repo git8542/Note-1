@@ -8,9 +8,11 @@
     - 句法结构中的递归
     - GUI查看递归下降过程
 - 4.上下文无关文法分析
-    - 递归下降分析
-    - 移进规约分析
-    - 左角落分析
+    - 递归下降分析（RDP）
+    - 移进归约分析（SRP）
+    - 左角落分析（LCP）
+    - 符合语句规则的字串表
+
 
 ### Overview
 前面我们一直关注词，现在我们来看看句子。`语言`被认为是所有合乎文法的句子的巨大集合
@@ -148,8 +150,92 @@ for tree in rd_parser.parse(sent):
     （3）回溯过程会丢弃分析过的成分，它们可能会在之后重建。比如：从`VP -> V NP`
     上回溯将放弃为NP创建的子树。如果分析器之后将处理`VP -> V NP PP`，那NP子树必须重建
 
-## （2）移进规约分析
+## （2）移进归约分析（shift reduce）
+**基本思想**
 
-## （3）左角落分析
+移进归约分析器尝试找到对应文法产生式右侧的词和短语序列，用左侧的替换它们，直到
+整个句子被归约为一个`S`。
 
+*移进归约分析的过程如下图*
+![](http://i.imgur.com/SWQSnLa.png)
+
+*GUI查看过程*
+
+使用`nltk.app.srparse()`函数
+
+*code example*
+
+```python
+sr_parse = nltk.ShiftReduceParser(grammar)
+sent = 'Mary saw a dog'.split()
+for tree in sr_parse.parse(sent):
+    print tree
+```
+
+**评价**
+
+分析器经常会面临两个选择：（a）有多种归约时，应该选择那种归约（b）当移进和归约
+都可以时选择哪个
+
+*缺点*：可能会到达一个死胡同，而不能找到任何解析，尽管输入的句子是合法的。当这种
+情况发生时，没有剩余的输入，而堆栈包含不能被归约到一个`S`的项目。原因是：较早
+做出的选择不能被分析器撤销。
+
+*优点*：对比递归下降分析器，（a）它只建立与输入中词对应的结构（b）每个结构只建立
+一次
+## （3）左角落分析（Left Corner Parsing）
+**基本思想**：
+
+递归下降分析器当遇到左递归产生式时，会进入无限循环。这是由于它盲目应用文法产生式
+而不考虑实际输入的句子。
+
+左角落分析器是自下而上与自上而下方法的混合体。准确来讲，是一个带自下而上过滤的
+自上而下的分析器。它会维护一个左角落表。分析器每次考虑产生式时，它会检查下一个
+输入词是否与左角落表格中至少一种非终结符的类别相容。
+
+**LCP过程演示如下**：
+
+[9.1.3 Combining Top-down and Bottom-up Information](http://cs.union.edu/~striegnk/courses/nlp-with-prolog/html/node53.html#l7.sec.leftcorner)
+
+*code example*
+```python
+lr_parse = nltk.LeftCornerChartParser(grammar)
+for tree in lr_parse.parse(sent):
+    print tree
+```
+## （4）符合语法规则的字串表
+这种方法利用动态规划存储中间结果，在适当的时候重用它们，能显著提高效率。动态规划
+使我们只用一次建立`PP in my pajamas`之后，将其存入一个表格，然后在我们需要作为
+对象`NP`或者更高的`VP`的组成成分用到它时，我们就查找表格。这个表格被称为*符合语法规则的子串表*
+或者简称为WFST。
+
+对于`I shot an elephant in my pajamas`这个句子，我们看看它的WFST
+
+*一个WFST的例子*
+
+![](http://i.imgur.com/7YgvKX0.png)
+
+*它的Graph表示*
+
+![](http://i.imgur.com/Xfwmruw.png)
+
+在WFST中，我们通过填充三角矩阵中的单元记录词的位置：纵轴表示一个子串（词序列）的
+起始位置，横轴表示一个子串的结束位置。我们在矩阵中存储词汇类型，所以`（1， 2）`
+将是`shot`的词性`V`的坐标。假设对于词`an`我们有`Det`在`（2， 3）`单元
+，对于词`elephant`有`N`在`（3， 4）`单元，则对于`an elephant`我们根据产生式
+`NP -> Det N`可知将`NP`放入`(2, 4)`单元。
+
+*code example*
+```python
+c_parse = nltk.ChartParser(grammar)  # 很多api，ChartParser只是其中之一
+for tree in c_parse.parse(sent):
+    print tree
+```
+
+**WFST缺点**
+
+    （1）WFST本身不是分析树，严格地说，它是认识到一个句子被文法承认（没明白含义 Q_Q）
+    （2）它要求每个非词汇文法产生式是二元的。一元会出现重叠，三元又无法表征
+    （3）作为一个自下而上的方法，它潜在的存在浪费，会在不符合文法的地方提出成分。（也没明白）
+    （4）它不能表示句子中的结构歧义。（？？）
 
