@@ -13,6 +13,13 @@
     - 左角落分析（LCP）
     - 符合语句规则的子串表
 - 5.依存文法
+    - 依存文法与依存关系
+    - 配价
+    - 一些文法开发项目
+- 6.文法开发
+    - 几个有用的语料库
+    - 加权文法
+
 
 ### Overview
 前面我们一直关注词，现在我们来看看句子。`语言`被认为是所有合乎文法的句子的巨大集合
@@ -253,6 +260,8 @@ for tree in c_parse.parse(sent):
 
 NLTK为依存文法编码了一种方式，但是请注意——它只能捕捉依存关系，不能指定依存关系
 类型。
+
+*依存文法示例*
 ```python
 # -*- coding: utf-8 -*-
 from nltk.grammar import DependencyGrammar
@@ -275,3 +284,182 @@ print dep_grammar
     'elephant' -> 'in'
     'in' -> 'pajamas'
     'pajamas' -> 'my'
+
+*依存关系图*
+
+依存关系图是一个投影，当所有的词都按线性顺序书写，边可以在词上绘制而不会交叉
+。也就是说一个词及其所有后代依赖在句子中形成一个连续的词序列。*如下图*：
+
+![依存文法](http://i.imgur.com/Yefp2ty.png)
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+from nltk.grammar import DependencyGrammar
+import nltk
+__author__ = 'BrownWong'
+dep_grammar = DependencyGrammar.fromstring("""
+    'shot' -> 'I' | 'elephant' | 'in'
+    'elephant' -> 'an' | 'in'
+    'in' -> 'pajamas'
+    'pajamas' -> 'my'
+    """)
+pdp = nltk.ProjectiveDependencyParser(dep_grammar)
+sent = 'I shot an elephant in my pajamas'.split()
+trees = pdp.parse(sent)
+for tree in trees:
+    print tree
+
+```
+*output*
+
+    (shot I (elephant an (in (pajamas my))))
+    (shot I (elephant an) (in (pajamas my)))
+（我们可以将括号括起来的依存关系表示成树，依赖作为中心词的孩子）
+
+![依存文法树](http://i.imgur.com/ZxPHnoc.png)
+
+**注意**：虽然短语结构文法看上去似乎与依存关系文法非常不同，但它们隐含着
+依存关系。
+
+## （2）配价
+
+*定义*
+
+> In linguistics, verb valency or valence is the number of arguments
+ controlled by a verbal predicate. It is related, though not
+ identical, to verb transitivity, which counts only object
+ arguments of the verbal predicate. Verb valency, on the other
+ hand, includes all arguments, including the subject of the verb.
+
+*动词配价类型*
+
+There are several types of valency: impersonal (=avalent), intransitive (=monovalent), transitive (=divalent), ditransitive (=trivalent) and tritransitive (=quadrivalent):
+- an impersonal verb has no determinate subject, e.g. `It rains.` (Though it is technically the subject of the verb in English, it is only a dummy subject, that is a syntactic placeholder - it has no concrete referent. No other subject can replace it. In many other languages, there would be no subject at all. In Spanish, for example, It is raining could be expressed as simply llueve.)
+- an intransitive verb takes one argument, e.g. `He1 sleeps.`
+- a transitive verb takes two, e.g. `He1 kicked the ball2.`
+- a ditransitive verb takes three, e.g. `He1 gave her2 a flower3.`
+- There are a few verbs that take four arguments; they are tritransitive. Sometimes `bet` is considered to have four arguments in English, as in the examples `I1 bet him2 five quid3 on ”The Daily Arabian”4` and `I1 bet you2 two dollars3 it will rain4`. Languages that mark arguments morphologically can have true "tritransitive" verbs, such as the causative of a ditransitive verb in Abaza (which incorporates all four arguments in the sentence "He couldn't make them give it back to her" as pronominal prefixes on the verb).
+
+（From WIKIPEDIA）
+
+**VP产生式与其常见动词代表**
+
+产生式 | 动词（中心词）代表
+-------|------------------
+VP -> V Adj | was
+VP -> V NP | saw
+VP -> V S | thought
+VP -> V NP PP | put
+
+在依存文法中，上述动词被认为有不同的配价。配价不仅限于动词，还适用于其他类
+的中心词。值得一提的是，在结构文法中，我们可以通过划分更多子类别（比如，动词
+下再划分及物动词、不及物动词）来达到和关系文法中使用配价得到的效果。
+
+## （3）一些文法开发项目
+
+词汇功能语法（Lexical Functional Grammar，LFG）Program项目、
+中心词驱动短语结构文法（Head-Drive Phrase Structure Grammar，HPSG）、
+LinGo矩阵框架、词汇化树邻接文法XTAG项目
+
+# 6.文法开发
+
+## （1）几个有用的语料库
+**treebank**
+treebank是一个已经标注好文法结构的语料库。
+
+*搜索treebank中带句子补语的动词*
+```python
+# -*- coding: utf-8 -*-
+from nltk.corpus import treebank
+import nltk
+def s_filter(tree):
+    child_labels = [child.label() for child in tree if isinstance(child, nltk.Tree)]
+    return (tree.label() == 'VP') and ('S' in child_labels)
+print [subtree for tree in treebank.parsed_sents() for subtree in tree.subtrees(s_filter)]
+
+```
+*output*
+
+    Tree('VP', [Tree('VBN', ['named']), Tree('S', [Tree('NP-SBJ', [Tree('-NONE-', ['*-1'])]......
+
+**ppattach**
+是一个有关特别动词配价的信息源。
+
+**large_grammar**
+
+**sinica_treebank**
+中央研究院语料库，包括10000句已分析好的句子。
+
+## （2）加权文法
+**出现背景**
+
+随着句子长度的增加，我们会发现对于某个文法我们的分析树的数量也在增加，也意味着
+歧义越来越多。我们的目标是开发一个广泛覆盖的分析器，处理歧义就成为一个绕不
+过去的坎。
+
+**符合文法的概念可能是有倾向性的**
+
+e.g. `give`这个动词既需要一个直接宾语也需要一个间接宾语。它既可能以*介词格*出现
+（`give a bone to the dog`），也可能以`双宾形式`出现（`give the dog a bone`）。
+但是当间接宾语是代词时，人们强烈偏好双宾形式。
+
+**概率上下文无关文法（PCFG）**
+
+*定义PCFG文法*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+grammar = nltk.PCFG.fromstring("""
+    S -> NP VP [1.0]
+    VP -> TV NP [0.4]
+    VP -> IV [0.3]
+    VP -> DatV NP NP [0.3]
+    TV -> 'saw' [1.0]
+    IV -> 'ate' [1.0]
+    DatV -> 'gave' [1.0]
+    NP -> 'telescopes' [0.8]
+    NP -> 'Jack' [0.2]
+    """)
+print grammar
+
+```
+*output*
+
+    Grammar with 9 productions (start state = S)
+        S -> NP VP [1.0]
+        VP -> TV NP [0.4]
+        VP -> IV [0.3]
+        VP -> DatV NP NP [0.3]
+        TV -> 'saw' [1.0]
+        IV -> 'ate' [1.0]
+        DatV -> 'gave' [1.0]
+        NP -> 'telescopes' [0.8]
+        NP -> 'Jack' [0.2]
+
+值得注意的是，请保证具有相同左侧的产生式的概率之和为1！
+
+*解析句子*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+grammar = nltk.PCFG.fromstring("""
+    S -> NP VP [1.0]
+    VP -> TV NP [0.4]
+    VP -> IV [0.3]
+    VP -> DatV NP NP [0.3]
+    TV -> 'saw' [1.0]
+    IV -> 'ate' [1.0]
+    DatV -> 'gave' [1.0]
+    NP -> 'telescopes' [0.8]
+    NP -> 'Jack' [0.2]
+    """)
+viterbi_parser = nltk.ViterbiParser(grammar)
+trees = viterbi_parser.parse(['Jack', 'saw', 'telescopes'])
+for tree in trees:
+    print tree
+
+```
+*output*
+
+    (S (NP Jack) (VP (TV saw) (NP telescopes))) (p=0.064)
