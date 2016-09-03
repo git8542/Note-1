@@ -3,7 +3,10 @@
     - 句法协议
     - 使用特征约束
     - 特征值的类型
-- 2.
+- 2.处理特征结构
+    - 特征结构基本操作
+    - 特征结构的图形化表示
+    - 包含和统一
 
 
 ### Overview
@@ -127,3 +130,253 @@ Adj -> 'happy'
     Attribute-value matrices are a practical way to present feature
     structures as a group of attributes and their corresponding values.
 
+# 2.处理特征结构
+本节主要关注上节所讲的特征结构在nltk中的操作。
+
+## (1)特征结构基本操作
+
+**特征结构的创建**
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+# 方法1：直接输入kv对创建
+print 'Method 1'
+print nltk.FeatStruct(TENSE='past', NUM='sg')
+# 方法2：字符串创建
+print 'Method 2'
+print nltk.FeatStruct("[TENSE='past', NUM='sg']")
+
+```
+*output*
+```
+Method 1
+[ NUM   = 'sg'   ]
+[ TENSE = 'past' ]
+Method 2
+[ NUM   = 'sg'   ]
+[ TENSE = 'past' ]
+```
+
+<br />
+
+**索引特征值**
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+fs = nltk.FeatStruct(TENSE='past', NUM='sg')
+print fs['TENSE']
+
+```
+*output*
+```
+past
+```
+
+<br />
+
+**创建特征值为特征结构的特征结构**
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+fs1 = nltk.FeatStruct(PER=3, NUM='pl', GND='fem')
+fs2 = nltk.FeatStruct(POS='N', AGR=fs1)
+print fs2
+
+```
+*output*
+```
+[       [ GND = 'fem' ] ]
+[ AGR = [ NUM = 'pl'  ] ]
+[       [ PER = 3     ] ]
+[                       ]
+[ POS = 'N'             ]
+```
+
+## (2)特征结构的图形化表示
+特征结构可以作为*有向无环图（DAGs）*来表示：特征名称作为弧上的标签，特征值作为弧指向节点的
+标签。
+
+*一个简单的图*
+
+![DAGS1](http://i.imgur.com/ceI3Cns.png)
+
+<br />
+
+*带有特征值为特征结构的图*
+
+![DAGS2](http://i.imgur.com/0TFT6lP.png)
+
+标签的元组可以表示路径：`(address, street)`就是一个*特征路径*。
+
+<br />
+
+**共享**
+
+*原始图*
+
+![Ori](http://i.imgur.com/Qx36Crl.png)
+
+我们发现最下面两棵子树其实是完全一样的，所以我们只保留一份。
+
+*共享后的图*
+
+![Share](http://i.imgur.com/09Iau1y.png)
+
+这种操作被称为*结构共享*或*重入*
+
+<br />
+
+**共享在nltk中的表示**
+
+为了表示*重入*，我们将会在共享特征结构第一次出现的地方加一个括号括起来的
+数字前缀，例如`(1)`。以后任何对这个结构的引用将使用符号`->(1)`。
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+print nltk.FeatStruct("""[NAME='Lee', ADDRESS=(1)[NUMBER=74, STREET='rue Pascal'],
+    SPOUSE=[NAME='Kim', ADDRESS->(1)]]""")
+
+```
+*output*
+```
+[ ADDRESS = (1) [ NUMBER = 74           ] ]
+[               [ STREET = 'rue Pascal' ] ]
+[                                         ]
+[ NAME    = 'Lee'                         ]
+[                                         ]
+[ SPOUSE  = [ ADDRESS -> (1)  ]           ]
+[           [ NAME    = 'Kim' ]           ]
+```
+
+*注意*
+
+括号内的整数被称为*标记*或*同指标志*（coindex）。整数的选择并不重要，一个
+特征结构中可以出现任意个标记。
+
+## (3)包含和统一
+
+**包含**
+
+下面的 a 比 b 更一般， b 比 c 更一般
+```
+a. [NUMBER = 74]
+
+b. [NUMBER = 74          ]
+   [STREET = 'rue Pascal']
+
+c. [NUMBER = 74          ]
+   [STREET = 'rue Pascal']
+   [CITY = 'Paris'       ]
+```
+这个顺序被称为*包含（subsumption）*:一个更一般的特征结构包含一个较少一般的。
+如果`FS0`包含`FS1`，那么`FS1`必须具备`FS0`的所有路径和等价路径，也可能有额外的路径
+和等价路径。
+
+<br />
+
+**统一**
+
+合并两个特征结构的信息被称为*统一*，由方法`unify()`支持。
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+fs1 = nltk.FeatStruct(NUMBER=74, STREET='rue Pascal')
+fs2 = nltk.FeatStruct(CITY='Paris')
+print fs1.unify(fs2)
+
+```
+*output*
+```
+[ CITY   = 'Paris'      ]
+[ NUMBER = 74           ]
+[ STREET = 'rue Pascal' ]
+```
+*注意*
+1. 统一是对称的,`fs1.unify(fs2)`和`fs2.unify(fs1)`等价。
+2. 如果我们统一两个具有包含关系的特征结构，那么结果将是两个中更具体的那个。
+3. 如果两个特征结构具有相同的路径`PI`，但路径所指向的值却不相同，那么统一
+之后的结果将是`None`
+
+可以将*统一*和*结构共享*结合起来，用来给特征结构的较深层添加特征。
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+fs1 = nltk.FeatStruct("""[NAME=Lee,
+                          ADDRESS=[NUMBER=74,STREET='rue Pascal'],
+                          SPOUSE= [NAME=Kim,ADDRESS=[NUMBER=74,STREET='rue Pascal']]]""")
+fs2 = nltk.FeatStruct("[SPOUSE=[ADDRESS=[CITY='Paris']]]")
+fs = fs1.unify(fs2)
+print 'Before unify:'
+print fs1
+print '\nLater unify:'
+print fs
+
+```
+*output*
+```
+Before unify:
+[ ADDRESS = [ NUMBER = 74           ]               ]
+[           [ STREET = 'rue Pascal' ]               ]
+[                                                   ]
+[ NAME    = 'Lee'                                   ]
+[                                                   ]
+[           [ ADDRESS = [ NUMBER = 74           ] ] ]
+[ SPOUSE  = [           [ STREET = 'rue Pascal' ] ] ]
+[           [                                     ] ]
+[           [ NAME    = 'Kim'                     ] ]
+
+Later unify:
+[ ADDRESS = [ NUMBER = 74           ]               ]
+[           [ STREET = 'rue Pascal' ]               ]
+[                                                   ]
+[ NAME    = 'Lee'                                   ]
+[                                                   ]
+[           [           [ CITY   = 'Paris'      ] ] ]
+[           [ ADDRESS = [ NUMBER = 74           ] ] ]
+[ SPOUSE  = [           [ STREET = 'rue Pascal' ] ] ]
+[           [                                     ] ]
+[           [ NAME    = 'Kim'                     ] ]
+```
+实际上我们可以直接向在深层嵌套的字典添加key-value那样操作。
+(尽管书上没有介绍，我倒觉得这样更方便)
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+fs1 = nltk.FeatStruct("""[NAME=Lee,
+                          ADDRESS=[NUMBER=74,STREET='rue Pascal'],
+                          SPOUSE= [NAME=Kim,ADDRESS=[NUMBER=74,STREET='rue Pascal']]]""")
+fs1['SPOUSE']['ADDRESS']['CITY'] = 'Paris'
+```
+
+*结构共享也可以使用变量`?x`来表示*
+
+*code example*
+```python
+# -*- coding: utf-8 -*-
+import nltk
+fs1 = nltk.FeatStruct("[ADDRESS1=[NUMBER=74, STREET='rue pascal']]")
+fs2 = nltk.FeatStruct("[ADDRESS1=?x, ADDRESS2=?x]")
+print fs1.unify(fs2)
+
+```
+*output*
+```
+[ ADDRESS1 = (1) [ NUMBER = 74           ] ]
+[                [ STREET = 'rue pascal' ] ]
+[                                          ]
+[ ADDRESS2 -> (1)                          ]
+```
