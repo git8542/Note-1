@@ -54,7 +54,7 @@ describe a certain type of formal grammar. A context-free grammar is a set
  of production rules that describe all possible strings in a given formal
  language. Production rules are simple replacements.For example, the rule
 `A-->a` Replaces `A` with `a` . There can be multiple replacement rules
-for any given value. For example,`A-->a` `B-->b` means that
+for any given value. For example,`A-->a` `A-->b` means that
 `A`can be replaced with either `a` or `b`.
 
 In context-free grammars, all rules are one to one, one to many, or one
