@@ -522,6 +522,7 @@ set([])
 <br />
 
 **β-约简**
+
 假设`Brown`满足上面的λ抽象: `\x.(walk(x) & chew_gum(y))`,我们记作：
 ```
 a. \x.(walk(x) & chew_gum(x)) (Brown)
@@ -530,7 +531,20 @@ a. \x.(walk(x) & chew_gum(x)) (Brown)
 ```
 b. (walk(Brown) & chew_gum(Brown))
 ```
-从`a式`到`b式`的操作被称为**β-约简**,它非常有用。
+从`a式`到`b式`的操作被称为**β-约简**,它非常有用。我们可以在nltk中使用`simplify()`方法对表达式进行β-约简。
 
+*Code Example:*
+```python
+>>> e = lp.parse(r'\x.(walk(x) & chew_gum(x))(gerald)')
+>>> print e
+\x.(walk(x) & chew_gum(x))(gerald)
+>>> print e.simplify()
+(walk(gerald) & chew_gum(gerald))
+```
 
-
+虽然我们迄今只考虑了**λ-抽象的主体**是一个某种类型 `t` 的开放公式，这不是必要的限制；
+主体可以是任何符合文法的表达式。下面是一个有两个`λ`的例子：
+```
+\x.\y.(dog(x) & own(y, x))
+```
+它带有两个参数。
