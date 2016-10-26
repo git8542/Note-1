@@ -542,9 +542,84 @@ b. (walk(Brown) & chew_gum(Brown))
 (walk(gerald) & chew_gum(gerald))
 ```
 
+<br />
+
+**多λ表达式**
+
 虽然我们迄今只考虑了**λ-抽象的主体**是一个某种类型 `t` 的开放公式，这不是必要的限制；
 主体可以是任何符合文法的表达式。下面是一个有两个`λ`的例子：
 ```
 \x.\y.(dog(x) & own(y, x))
 ```
-它带有两个参数。
+它带有两个参数。`LogicParser`允许出现多个λ,如`\x.\y`,它可以简写为`\x y`。
+
+*多λ示例：*
+```python
+>>> print lp.parse(r'\x.\y.(dog(x) & own(y, x))(cyril)').simplify()
+\y.(dog(cyril) & own(y,cyril))
+>>> print lp.parse(r'\x y.(dog(x) & own(y, x))(cyril, angus)').simplify()
+(dog(cyril) & own(angus,cyril))
+```
+
+<br />
+
+**抽象参数**
+
+我们所有的λ-抽象到目前为止只涉及熟悉的一阶变量： `x`、 `y`等——类型`e`的变量。但
+假设我们要处理一个抽象，例如： `\x.walk(x)`，作为另一个λ-抽象的参数该怎么办？
+
+我们用`P`,`Q`作为**抽象类型的变量**，对于`Brown walk.`这句话，我们有如下公式:
+```
+\P.P(Brown)(\x.walk(x))
+```
+使用β-约简得到：`\x.walk(x)(Brown)`,再次化简：`walk(Brown)`。
+
+<br />
+
+**使用β-约简时需要注意**
+
+对于下面的两个λ表达式：
+```
+a. \y.see(y,x)
+b. \y.see(y,z)
+```
+它们是等价的，只是notation有区别。然而被使用到`\P.exists x.P(x)`中，即：
+```
+a. \P.exists x.P(x)(\y.see(y,x))  ==> exists x.see(x,x)
+b. \P.exists x.P(x)(\y.see(y,z))  ==> exists x.see(x,z)
+```
+得到的结果却不相同，`a`化简后变成了`存在x，看见它自己`了。我们已经知道，这是notation
+造成的。
+
+如果两个公式notation不同但等价，我们称之为**α等价**。
+重新标记绑定变量的过程被称为**α转换**。我们在测试**变量绑定表达式**是否相等时，
+其实是在测试两个表达式是否α等价。
+
+*测试α等价：*
+```python
+>>> e1 = lp.parse('exists x.P(x)')
+>>> print e1
+exists x.P(x)
+>>> e2 = e1.alpha_convert(nltk.Variable('z'))
+>>> print e2
+exists z.P(z)
+>>> e1 == e2
+True
+```
+
+当β-约简在一个公式`f(a)`中进行时，我们应该检查是否存在这么一个变量notation，
+它即在`a`中充当自由变量，同时也在`f`中充当绑定变量。
+
+假设`x`是`a`中的自由变量，`f`表达式写作:`exists x.P(x)`。这种情况下，
+我们应该产生一个`f`表达式的字母变体，比如：`exists z.P(z)`,然后再进行约减。
+所幸nltk帮我们自动进行转换。
+
+*自动α转换：*
+```
+>>> e3 = lp.parse(r'\P.exists x.P(x)(\y.see(y, x))')
+>>> print e3
+(\P.exists x.P(x))(\y.see(y,x))  # 进行了自动转换
+>>> print e3.simplify()
+exists z1.see(z1,x)
+```
+
