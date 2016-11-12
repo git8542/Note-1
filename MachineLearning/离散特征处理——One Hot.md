@@ -3,6 +3,8 @@
 1. 问题的产生
 2. One-Hot编码
 3. 在sklearn中使用One-Hot
+    - 使用`OneHotEncoder()`
+    - 使用`DictVectorizer()`
 
 # 1. 问题的产生
 在很多机器学习任务中，特征并不总是连续值，而有可能是**离散值**。
@@ -39,6 +41,9 @@ One-Hot编码后可能会出现数据稀疏问题。
 
 # 3. 在sklearn中使用One-Hot
 
+## （1）使用`OneHotEncoder()`
+
+*Code Example：*
 ```python
 In [99]: from sklearn import preprocessing
 
@@ -53,12 +58,33 @@ array([[ 1.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  1.],
        [ 1.,  0.,  0.,  0.,  1.,  0.,  1.,  0.,  0.],
        [ 0.,  1.,  1.,  0.,  0.,  0.,  0.,  1.,  0.]])
 ```
-我们编码了3个离散的特征，3个特征的可能取值分别有2，3，4种。所以最终每个instance被映射为9个二元特征。
+**解释**：我们编码了3个离散的特征，3个特征的可能取值分别有2，3，4种。所以最终每个instance被映射为9个二元特征。
+
+## （2）使用`DictVectorizer()`
+它接收一个dict数组。每个dict代表一个instance，它的key代表特征名称，value代表特征值。
+
+- 如果特征值为数值类型，原样输出；
+- 如果特征值为字符串类型，则使用One-Hot编码。
+
+*Code Example：*
+```python
+In [103]: from sklearn.feature_extraction import DictVectorizer
+
+In [104]: dict_vectorizer = DictVectorizer(sparse=False)
+
+In [105]: x_dict = [{'A': 1, 'B': '1'}, {'A': 2, 'B': '2'}]
+
+In [106]: dict_vectorizer.fit_transform(x_dict)
+Out[106]:
+array([[ 1.,  1.,  0.],
+       [ 2.,  0.,  1.]])
+```
+**解释**：对于特征`A`，它的数据类型为`int`，向量化之后原样输出；对于特征`B`，它的类型为`str`，表明特征为离散特征，采用One-Hot编码为两个二元特征。
+
+**注意**：dict表示法被视为稀疏矩阵，即它们只包含value非0的特征。也就是说，如果instance A中包含特征a，而instance B中不包含特征a，则说明instance B中特征a的值为0。
 
 <br />
 
 **Ref**:
 
 [one hot 编码及数据归一化](http://blog.csdn.net/dulingtingzi/article/details/51374487)
-
-
