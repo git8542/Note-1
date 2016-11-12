@@ -59,6 +59,6 @@ array([[ 1.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  1.],
 
 **Ref**:
 
-[](http://blog.csdn.net/dulingtingzi/article/details/51374487)
+[one hot 编码及数据归一化](http://blog.csdn.net/dulingtingzi/article/details/51374487)
 
 
