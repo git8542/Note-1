@@ -39,33 +39,3 @@ Neighbors-based regression can be used in cases where the data labels are contin
 
 ## （4）近似最近邻
 **Approximate nearest neighbor** search methods have been designed to try to speedup query time with high dimensional data.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
