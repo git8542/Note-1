@@ -1,3 +1,3 @@
 
-![一维搜索方法1](http://imgur.com/a/5hYZN)
-![一维搜索方法2](http://imgur.com/a/6TtiJ)
+![一维搜索方法1](http://i.imgur.com/wM3fucT.jpg)
+![一维搜索方法2](http://i.imgur.com/XPwiteU.jpg)
