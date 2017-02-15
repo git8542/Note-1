@@ -57,3 +57,9 @@ for i in range(10):
     clf.fit(X, y)
     # additional monitoring / inspection 
 ```
+
+<br />
+
+Ref:
+
+http://scikit-learn.org/stable/modules/neural_networks_supervised.html#neural-network-models-supervised
