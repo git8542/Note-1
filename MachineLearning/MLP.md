@@ -15,6 +15,7 @@
 1. MLP with hidden layers have a non-convex loss function where there exists more than one local minimum. Therefore different random weight initializations can lead to different validation accuracy.
 2. MLP requires tuning a number of hyperparameters such as the number of hidden neurons, layers, and iterations.
 3. MLP is sensitive to feature scaling.
+
 # 2. 实践
 ## （1）分类
 使用[`sklearn.neural_network.MLPClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html#sklearn.neural_network.MLPClassifier)API。
