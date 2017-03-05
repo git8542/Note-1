@@ -1,5 +1,5 @@
 *简单使用*：
-```
+```python
 # -*- coding: utf-8 -*-
 from gensim import corpora
 from gensim import models
