@@ -29,7 +29,7 @@ Convolutional neural networks are biologically inspired variants of multilayer p
 ![](http://i.imgur.com/F6jQsOZ.png)
 （采样层即池化层）
 
-###2.1 卷积层
+### 2.1 卷积层
 结构如图：
 ![](http://i.imgur.com/dN17hcY.png)
 
@@ -37,7 +37,7 @@ The convolutional layer is the core building block of a CNN. The layer's paramet
 
 （每个卷积层是由多个特征图堆积而成，一个过滤器或者称为卷积核产生一个特征图feature map，有时候把特征图称作通道channel；一个特征图其实是一个卷积核提取出来的特征。）
 
-####2.1.1 卷积运算
+#### 2.1.1 卷积运算
 
 ![](http://i.imgur.com/OQ8M3IK.png)
 
@@ -51,10 +51,10 @@ The convolutional layer is the core building block of a CNN. The layer's paramet
 
 （对于为什么卷积可以用点积实现，暂留疑问？？）
 
-####2.1.2 权值共享
+#### 2.1.2 权值共享
 It relies on one reasonable assumption: That if one patch feature is useful to compute at some spatial position, then it should also be useful to compute at a different position. In other words, denoting a single 2-dimensional slice of depth as a depth slice, we constrain the neurons in each depth slice to use the same weights and bias.
 
-####2.1.3 空间排列（Spatial arrangement）
+#### 2.1.3 空间排列（Spatial arrangement）
 
 一个输出单元的大小有以下三个量控制：depth, stride 和 zero-padding。
 
@@ -65,12 +65,12 @@ It relies on one reasonable assumption: That if one patch feature is useful to c
 
 ![](http://i.imgur.com/pBctykS.png)
 
-####2.1.4 非第一卷积层
+#### 2.1.4 非第一卷积层
 这里的卷积层的输入是由多个特征图堆叠而成的（刚刚所说的那种卷积层的输入直接是输入层，即输入只有一个特征图），结构见下图：
 ![](http://i.imgur.com/xifBiTl.png)
 上图展示了在四个通道上的卷积操作，有两个卷积核，生成两个通道。其中需要注意的是，四个通道上每个通道对应一个卷积核，先将w2忽略，只看w1，那么在w1的某位置（i,j）处的值，是由四个通道上（i,j）处的卷积结果相加然后再取激活函数值得到的。
 
-###2.2 线性整流层（ReLU layer）
+### 2.2 线性整流层（ReLU layer）
 ReLU is the abbreviation of Rectified Linear Units. This is a layer of neurons that applies the non-saturating activation function {\displaystyle f(x)=\max(0,x)} . It increases the nonlinear properties of the decision function and of the overall network without affecting the receptive fields of the convolution layer.
 
 Other functions are also used to increase nonlinearity, for example the saturating hyperbolic **tangent** and the **sigmoid** function. Compared to other functions the usage of ReLU is preferable, because it results in the neural network training several times faster, without making a significant difference to generalisation accuracy.
