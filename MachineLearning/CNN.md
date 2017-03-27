@@ -1,4 +1,8 @@
-#<p align=center> 卷积神经网络
+强烈安利这篇介绍cnn的文章
+[Convolutional Neural Networks (CNNs / ConvNets)](http://cs231n.github.io/convolutional-networks/)
+
+
+# <p align=center> 卷积神经网络
 
 ## Overview
 Convolutional networks were inspired by biological processes and are variations of **multilayer perceptrons** designed to use **minimal amounts of preprocessing**. They have wide applications in image and video recognition, recommender systems and natural language processing.
@@ -66,9 +70,10 @@ It relies on one reasonable assumption: That if one patch feature is useful to c
 ![](http://i.imgur.com/pBctykS.png)
 
 #### 2.1.4 非第一卷积层
-这里的卷积层的输入是由多个特征图堆叠而成的（刚刚所说的那种卷积层的输入直接是输入层，即输入只有一个特征图），结构见下图：
+这里的卷积层的输入是由多个特征图堆叠而成的（第一个卷积层的输入直接是输入层，此时的输入只有一个特征图），结构见下图：
+
 ![](http://i.imgur.com/xifBiTl.png)
-上图展示了在四个通道上的卷积操作，有两个卷积核，生成两个通道。其中需要注意的是，四个通道上每个通道对应一个卷积核，先将w2忽略，只看w1，那么在w1的某位置（i,j）处的值，是由四个通道上（i,j）处的卷积结果相加然后再取激活函数值得到的。
+
 
 ### 2.2 线性整流层（ReLU layer）
 ReLU is the abbreviation of Rectified Linear Units. This is a layer of neurons that applies the non-saturating activation function {\displaystyle f(x)=\max(0,x)} . It increases the nonlinear properties of the decision function and of the overall network without affecting the receptive fields of the convolution layer.
