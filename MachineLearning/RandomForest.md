@@ -52,7 +52,7 @@ Reducing m reduces both the correlation and the strength. Increasing it increase
 
 Adding one further step of randomization yields **extremely randomized trees**, or **ExtraTrees**. These are trained using bagging and the random subspace method, like in an ordinary random forest, but additionally the top-down splitting in the tree learner is randomized. Instead of computing the locally optimal feature/split combination (based on, e.g., information gain or the Gini impurity), for each feature under consideration, a random value is selected for the split. This value is selected from the feature's empirical range (in the tree's training set, i.e., the bootstrap sample)
 
-###Variants
+### Variants
 
 Instead of decision trees, linear models have been proposed and evaluated as base estimators in random forests, in particular multinomial logistic regression and naive Bayes classifiers.
 
@@ -62,6 +62,7 @@ Instead of decision trees, linear models have been proposed and evaluated as bas
 <br>
 <br>
 <br>
+
 **References**
 
 [https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#intro](https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#intro)
