@@ -99,6 +99,7 @@ E.A.Feigenbaum等人将机器学习划分为“机械学习”、“示教学习
 国内会议： 中国机器学习大会CCML、机器学习及其应用研讨会MLA
 
 **人工智能领域：**
+
 会议：IJCAI，AAAI 
 
 期刊：Artificial Intelligence，Journal of Artificial Intelligence Research
