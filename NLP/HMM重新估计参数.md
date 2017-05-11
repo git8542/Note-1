@@ -6,6 +6,7 @@
 4. 用维特比算法（或者直接使用[jieba.finalseg.cut()](https://github.com/fxsjy/jieba/blob/master/jieba/finalseg/__init__.py)方法）使用上面的参数预测分词。
 5. 使用http://sighan.cs.uchicago.edu/bakeoff2005/ 提供的score脚本及测试数据测试模型，获得模型相关评测指标。（使用方式都在README内）
 
+# Code Example
 ```python
 MIN_FLOAT = -3.14e+100
 
