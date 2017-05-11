@@ -4,7 +4,7 @@
 2. 利用极大似然估计方式估计HMM模型三个参数矩阵——初始状态概率矩阵、状态转移概率矩阵、观测发射概率矩阵。（有监督的HMM参数估计算法详见《统计学习方法》10.3.1节）
 3. 最好对参数矩阵中的每个概率值取对数，原因是可以将概率相乘计算变成对数相加，这在预测时很有用。概率0值的对数（负无穷）使用3.14e+100表示。
 4. 用维特比算法（或者直接使用[jieba.finalseg.cut()](https://github.com/fxsjy/jieba/blob/master/jieba/finalseg/__init__.py)方法）使用上面的参数预测分词。
-5. 使用http://sighan.cs.uchicago.edu/bakeoff2005/ 提供的score脚本及测试数据测试模型，获得模型相关评测指标。（使用方式都在README内）
+5. 使用http://sighan.cs.uchicago.edu/bakeoff2005/ 提供的score脚本及测试数据测试模型，获得模型相关评测指标。（使用方式都在下载的文件的README内）
 
 # Code Example
 ```python
