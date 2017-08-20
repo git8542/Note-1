@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
 *完整代码：*
 
-```
+```python
 # -*- coding: utf-8 -*-
 # __author__ = 'Brown'
 # create 8/17/17 16:19
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
 *完整代码*
 
-```
+```python
 # -*- coding: utf-8 -*-
 # __author__ = 'Brown'
 # create 8/17/17 16:19
